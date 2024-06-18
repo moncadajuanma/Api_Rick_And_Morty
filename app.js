@@ -1,15 +1,23 @@
 const url = 'https://rickandmortyapi.com/api/character'
+
 let charactersContent = document.getElementById('characters')
+let input = document.getElementById('search-input')
+
+let characters = [] //variable para almacenar todos los personajes
 
 const getCharacters = async () => {
   //consumo de personajes de rick and morty
-  let characters = await fetch(url)
+  let _characters = await fetch(url)
     .then(response => response.json())
     .then(data => data.results);
 
+  characters = _characters
+  createCharacters(_characters)
+}
 
-  for (let index = 0; index < characters.length; index++) {
-    const element = characters[index];
+const createCharacters = (data) => {
+  for (let index = 0; index < data.length; index++) {
+    const element = data[index];
 
     //creamos la card de cada uno de los personajes
     let div = document.createElement('div')
@@ -35,10 +43,26 @@ const getCharacters = async () => {
     div.appendChild(divData)
     divData.appendChild(name)
     divData.appendChild(gender)
-    
+
     //su padre final
     charactersContent.appendChild(div)
   }
 }
 
-console.log(getCharacters());
+const filterCharacters = (event) => {
+  let filter = (event.target.value).toLowerCase();
+
+  charactersContent.innerHTML = '';
+
+  const filterNames = characters.map((element) => {
+    if (element.name.toLowerCase().includes(filter)) {
+      return element
+    }
+    return;
+  }).filter(element => element);
+  
+  createCharacters(filterNames)
+}
+
+addEventListener('DOMContentLoaded', getCharacters)
+input.addEventListener('keyup', filterCharacters)
